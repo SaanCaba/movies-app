@@ -3,5 +3,6 @@ export interface AppContext{
     signup: (email:string, password:string) => void
     login: (email:string, password:string) => void
     logout: () => void,
+    loading:boolean
 
 }

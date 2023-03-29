@@ -7,6 +7,7 @@ import {
     signOut,
     UserCredential,
 } from "firebase/auth";
+import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebase.config";
 import { AppContext } from "../models/context.models";
@@ -16,6 +17,7 @@ export const ContextApp = createContext<AppContext>({
     signup: () => {},
     login: () => {},
     logout: () => {},
+    loading: false,
 });
 
 interface Props {
@@ -29,6 +31,8 @@ export const useAppContext = (): AppContext => {
 
 export function AppProvider({ children }: Props) {
     const [user, setUser] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const router = useRouter();
 
     const signup = async (
         email: string,
@@ -55,6 +59,7 @@ export function AppProvider({ children }: Props) {
             );
             const token = await response.user.getIdToken();
             sessionStorage.setItem("auth_token", token);
+            setUser(response.user.email);
         } catch (error) {
             if (error instanceof FirebaseError) {
                 return error.code;
@@ -72,16 +77,21 @@ export function AppProvider({ children }: Props) {
     };
 
     useEffect(() => {
+        if (sessionStorage.getItem("auth_token") === null) {
+            return router.push("/login");
+        }
+        setLoading(true);
         onAuthStateChanged(auth, (currentUser) => {
             if (currentUser === null) {
-                return;
+                return setLoading(false);
             }
             setUser(currentUser.email);
+            setLoading(false);
         });
     }, []);
 
     return (
-        <ContextApp.Provider value={{ user, signup, login, logout }}>
+        <ContextApp.Provider value={{ user, signup, login, logout, loading }}>
             {children}
         </ContextApp.Provider>
     );
