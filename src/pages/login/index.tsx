@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import React, { FormEvent, useRef } from "react";
 import { useAppContext } from "../../appContext/context";
 
@@ -6,6 +7,7 @@ const Login = () => {
     const passwordRef = useRef<HTMLInputElement | null>(null);
 
     const { login } = useAppContext();
+    const router = useRouter();
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -16,6 +18,7 @@ const Login = () => {
         if (errMessage !== undefined) {
             return console.log(errMessage);
         }
+        router.push("/");
         console.log("autentificado!");
     };
 

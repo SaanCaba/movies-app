@@ -2,7 +2,9 @@ import { create } from "domain";
 import { FirebaseError } from "firebase/app";
 import {
     createUserWithEmailAndPassword,
+    onAuthStateChanged,
     signInWithEmailAndPassword,
+    signOut,
 } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebase.config";
@@ -12,6 +14,7 @@ export const ContextApp = createContext<AppContext>({
     user: null,
     signup: () => {},
     login: () => {},
+    logout: () => {},
 });
 
 interface Props {
@@ -52,8 +55,31 @@ export function AppProvider({ children }: Props) {
         }
     };
 
+    const logout = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser === null) {
+                return;
+            }
+            console.log(currentUser);
+            setUser(currentUser.email);
+            // void (async () => {
+            // 	const userDBData: UserDBInfo = await getUserInfo(currentUser?.uid);
+            // 	setUserProfileData(userDBData);
+            // 	setLoading(false);
+            // })();
+        });
+    }, []);
+
     return (
-        <ContextApp.Provider value={{ user, signup, login }}>
+        <ContextApp.Provider value={{ user, signup, login, logout }}>
             {children}
         </ContextApp.Provider>
     );
