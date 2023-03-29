@@ -5,6 +5,7 @@ import {
     onAuthStateChanged,
     signInWithEmailAndPassword,
     signOut,
+    UserCredential,
 } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebase.config";
@@ -47,7 +48,13 @@ export function AppProvider({ children }: Props) {
         password: string
     ): Promise<void | string> => {
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const response: UserCredential = await signInWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+            const token = await response.user.getIdToken();
+            sessionStorage.setItem("auth_token", token);
         } catch (error) {
             if (error instanceof FirebaseError) {
                 return error.code;
@@ -58,6 +65,7 @@ export function AppProvider({ children }: Props) {
     const logout = async () => {
         try {
             await signOut(auth);
+            sessionStorage.removeItem("auth_token");
         } catch (error) {
             console.log(error);
         }
@@ -68,13 +76,7 @@ export function AppProvider({ children }: Props) {
             if (currentUser === null) {
                 return;
             }
-            console.log(currentUser);
             setUser(currentUser.email);
-            // void (async () => {
-            // 	const userDBData: UserDBInfo = await getUserInfo(currentUser?.uid);
-            // 	setUserProfileData(userDBData);
-            // 	setLoading(false);
-            // })();
         });
     }, []);
 
