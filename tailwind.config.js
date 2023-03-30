@@ -10,6 +10,11 @@ module.exports = {
     ],
     theme: {
         extend: {},
+        theme: {
+            zIndex: {
+                "-10": "-10",
+            },
+        },
+        plugins: [],
     },
-    plugins: [],
 };
