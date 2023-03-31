@@ -2,8 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-    padding: 0px;
+#__next {
     margin: 0px;
-    font-family: "Roboto", sans-serif;
+    padding: 0px;
 }

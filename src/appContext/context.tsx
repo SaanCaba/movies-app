@@ -77,9 +77,6 @@ export function AppProvider({ children }: Props) {
     };
 
     useEffect(() => {
-        if (sessionStorage.getItem("auth_token") === null) {
-            return router.push("/login");
-        }
         setLoading(true);
         onAuthStateChanged(auth, (currentUser) => {
             if (currentUser === null) {
